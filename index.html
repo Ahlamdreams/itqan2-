@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>لوحة الإتقان — أيقونات + تحليل شامل</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    body{font-family:"Tajawal",system-ui;}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:18px}
+    .shadowSoft{box-shadow:0 10px 30px rgba(2,6,23,.08)}
+    .grad{background:linear-gradient(135deg,#0ea5e9 0%, #6366f1 45%, #a855f7 100%)}
+    .mono{font-variant-numeric:tabular-nums}
+    .chip{border-radius:999px;padding:.25rem .7rem;font-weight:800;font-size:.85rem;display:inline-flex;align-items:center;gap:.35rem;border:1px solid transparent;white-space:nowrap;}
+    .badgeBar{width:10px;height:28px;border-radius:999px;display:inline-block}
+    .legendDot{width:10px;height:10px;border-radius:999px;display:inline-block}
+    .iconBtn{border:1px solid #e5e7eb;border-radius:16px;padding:.85rem 1rem;font-weight:900;display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+    .iconBtn:hover{background:#f8fafc}
+    .miniTag{font-size:.78rem;font-weight:900}
+    #modalBackdrop{display:none}
+    #modalBackdrop.show{display:flex}
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+<div class="mx-auto max-w-7xl p-4 md:p-8">
+
+  <!-- Header -->
+  <div class="grad text-white rounded-3xl p-6 md:p-8 shadowSoft">
+    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-extrabold">لوحة الإتقان — تفاعلية بالأيقونات</h1>
+        <p class="text-white/90 mt-2 leading-7">مدرسة أم مالك الأنصارية للبنات — نهاية الفصل الدراسي الأول</p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="window.print()" class="bg-white/15 hover:bg-white/25 px-4 py-2 rounded-2xl font-bold">🖨️ طباعة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Icons row -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+    <button class="iconBtn shadowSoft bg-white" onclick="openModal('subjectHub')">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">📚</span>
+        <div class="text-right">
+          <div class="text-slate-500 text-sm">تحليل</div>
+          <div class="text-lg font-extrabold">مستوى المادة</div>
+        </div>
+      </div>
+      <span class="miniTag text-slate-500">اضغطي</span>
+    </button>
+
+    <button class="iconBtn shadowSoft bg-white" onclick="openModal('stage')">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">🏫</span>
+        <div class="text-right">
+          <div class="text-slate-500 text-sm">تحليل</div>
+          <div class="text-lg font-extrabold">مستوى المرحلة</div>
+        </div>
+      </div>
+      <span class="miniTag text-slate-500">اضغطي</span>
+    </button>
+
+    <button class="iconBtn shadowSoft bg-white" onclick="openModal('classes')">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">👥</span>
+        <div class="text-right">
+          <div class="text-slate-500 text-sm">تحليل</div>
+          <div class="text-lg font-extrabold">مستوى الفصول</div>
+        </div>
+      </div>
+      <span class="miniTag text-slate-500">جاهز للربط</span>
+    </button>
+
+    <!-- ✅ NEW: Summary Icon -->
+    <button class="iconBtn shadowSoft bg-white" onclick="openModal('summary')">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">📊</span>
+        <div class="text-right">
+          <div class="text-slate-500 text-sm">تحليل شامل</div>
+          <div class="text-lg font-extrabold">صف • مادة • مرحلة</div>
+        </div>
+      </div>
+      <span class="miniTag text-slate-500">الأعلى/الأقل</span>
+    </button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+    <div class="card shadowSoft p-5">
+      <div class="text-slate-500 text-sm">🏫 النسبة العامة للإتقان (المدرسة)</div>
+      <div class="text-4xl font-extrabold mono mt-1" id="kpiOverall"></div>
+      <div class="mt-2" id="kpiOverallChip"></div>
+    </div>
+
+    <div class="card shadowSoft p-5">
+      <div class="text-slate-500 text-sm">🧑‍🎓 الصف الخامس</div>
+      <div class="text-3xl font-extrabold mono mt-1" id="kpiG5"></div>
+      <div class="mt-2" id="tagG5"></div>
+    </div>
+
+    <div class="card shadowSoft p-5">
+      <div class="text-slate-500 text-sm">🧑‍🎓 الصف السادس</div>
+      <div class="text-3xl font-extrabold mono mt-1" id="kpiG6"></div>
+      <div class="mt-2" id="tagG6"></div>
+    </div>
+
+    <div class="card shadowSoft p-5">
+      <div class="text-slate-500 text-sm">⭐ أعلى/أقل (صف + مادة)</div>
+      <div class="mt-2 leading-8">
+        🥇 أفضل صف: <b id="bestGrade"></b><br>
+        🥉 أقل صف: <b id="worstGrade"></b><br>
+        🥇 أفضل مادة: <b id="bestSubject"></b><br>
+        🥉 أقل مادة: <b id="worstSubject"></b>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="card shadowSoft p-5 mt-4">
+    <h2 class="font-extrabold text-lg mb-3">مفتاح الأحكام (اللون + الرمز)</h2>
+    <div id="legend" class="flex flex-col gap-2 text-sm"></div>
+  </div>
+
+  <!-- Chart -->
+  <div class="card shadowSoft p-5 mt-4">
+    <div class="flex items-center justify-between gap-2">
+      <h2 class="font-extrabold text-lg">📊 نسب الإتقان حسب المواد (خامس × سادس)</h2>
+      <div class="text-sm text-slate-600">اضغطي على أي عمود لفتح تحليل المادة</div>
+    </div>
+    <div class="mt-4"><canvas id="subjectsChart" height="120"></canvas></div>
+  </div>
+
+  <!-- Table -->
+  <div class="card shadowSoft p-5 mt-4">
+    <div class="flex items-center justify-between gap-2">
+      <h2 class="font-extrabold text-lg">🧾 التفاصيل (اضغطي الصف لفتح تحليل المادة)</h2>
+      <div class="text-sm text-slate-600">النسبة = الحاصلين ÷ العدد × 100</div>
+    </div>
+    <div class="overflow-auto mt-4">
+      <table class="w-full text-right">
+        <thead class="text-slate-500 text-sm">
+          <tr class="border-b">
+            <th class="py-2 px-2">الحالة</th>
+            <th class="py-2 px-2">الصف</th>
+            <th class="py-2 px-2">المادة</th>
+            <th class="py-2 px-2">الحاصلين</th>
+            <th class="py-2 px-2">العدد</th>
+            <th class="py-2 px-2">النسبة</th>
+            <th class="py-2 px-2">الحكم</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal -->
+<div id="modalBackdrop" class="fixed inset-0 z-50 items-center justify-center bg-black/40 p-3">
+  <div class="w-full max-w-3xl bg-white rounded-3xl shadowSoft border border-slate-200 overflow-hidden">
+    <div class="flex items-start justify-between gap-3 p-5 border-b">
+      <div>
+        <div class="text-slate-500 text-sm" id="modalKicker">تحليل</div>
+        <h3 class="text-xl font-extrabold" id="modalTitle">—</h3>
+      </div>
+      <button class="px-3 py-2 rounded-xl border hover:bg-slate-50 font-bold" onclick="closeModal()">✖ إغلاق</button>
+    </div>
+    <div class="p-5 space-y-4" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+/* ====== سلم الأحكام ====== */
+const SCALE = [
+  {code:1, label:"ممتاز", min:70, max:100.0001, color:"#16a34a", icon:"🌟"},
+  {code:2, label:"جيد",   min:60, max:70,       color:"#22c55e", icon:"✅"},
+  {code:3, label:"ملائم", min:50, max:60,       color:"#facc15", icon:"🟡"},
+  {code:4, label:"غير ملائم", min:40, max:50,   color:"#fb923c", icon:"⚠️"},
+  {code:5, label:"يحتاج إلى تدخل سريع", min:-1e9, max:40, color:"#ef4444", icon:"🚨"},
+];
+const judge = (pct)=> SCALE.find(s => pct >= s.min && pct < s.max) || SCALE[SCALE.length-1];
+const fmt = (n)=> n.toFixed(2) + "%";
+const chipHTML = (j)=> `<span class="chip" style="background:${j.color}18;color:${j.color};border-color:${j.color}55"><b class="mono">${j.code}</b> ${j.icon} ${j.label}</span>`;
+const barHTML = (color)=> `<span class="badgeBar" style="background:${color}"></span>`;
+
+/* ====== بيانات مطابقة للصورة ====== */
+const rows = [
+  {grade:"الخامس", subject:"اللغة الإنجليزية", achievers:124, total:205, pct:60.49},
+  {grade:"الخامس", subject:"الرياضيات",       achievers: 65, total:205, pct:31.71},
+  {grade:"الخامس", subject:"العلوم",           achievers: 99, total:205, pct:48.29},
+  {grade:"الخامس", subject:"الدراسات الاجتماعية", achievers:112, total:205, pct:54.63},
+  {grade:"الخامس", subject:"التربية الإسلامية",   achievers:140, total:205, pct:68.29},
+  {grade:"الخامس", subject:"اللغة العربية",       achievers:147, total:205, pct:71.71},
+
+  {grade:"السادس", subject:"التربية الإسلامية", achievers:116, total:240, pct:48.33},
+  {grade:"السادس", subject:"اللغة العربية",     achievers:184, total:240, pct:76.67},
+  {grade:"السادس", subject:"اللغة الإنجليزية",  achievers:111, total:240, pct:46.25},
+  {grade:"السادس", subject:"الرياضيات",         achievers:109, total:240, pct:45.42},
+  {grade:"السادس", subject:"العلوم",            achievers:166, total:240, pct:69.17},
+  {grade:"السادس", subject:"الدراسات الاجتماعية", achievers:177, total:240, pct:73.75},
+];
+
+const subjects = [...new Set(rows.map(r=>r.subject))];
+const pctOf = (grade, subject)=> rows.find(r=>r.grade===grade && r.subject===subject)?.pct ?? 0;
+
+function gradeOverall(grade){
+  const rs = rows.filter(r=>r.grade===grade);
+  const a = rs.reduce((s,x)=>s+x.achievers,0);
+  const t = rs.reduce((s,x)=>s+x.total,0);
+  return (a/t)*100;
+}
+function schoolOverall(){
+  const a = rows.reduce((s,x)=>s+x.achievers,0);
+  const t = rows.reduce((s,x)=>s+x.total,0);
+  return (a/t)*100; // 58.05%
+}
+function subjectStage(subject){
+  const rs = rows.filter(r=>r.subject===subject);
+  const a = rs.reduce((s,x)=>s+x.achievers,0);
+  const t = rs.reduce((s,x)=>s+x.total,0);
+  return {subject, achievers:a, total:t, pct:(a/t)*100};
+}
+function bestWorstRows(list){
+  const best = list.reduce((a,b)=>a.pct>b.pct?a:b);
+  const worst= list.reduce((a,b)=>a.pct<b.pct?a:b);
+  return {best,worst};
+}
+
+/* ====== Legend ====== */
+const legend = document.getElementById("legend");
+SCALE.forEach(s=>{
+  const div=document.createElement("div");
+  div.className="flex items-center justify-between gap-3";
+  div.innerHTML = `
+    <div class="flex items-center gap-2">
+      <span class="legendDot" style="background:${s.color}"></span>
+      <span class="font-extrabold">${s.icon} ${s.label}</span>
+      <span class="mono text-slate-500">(${s.code})</span>
+    </div>
+    <div class="text-slate-500">
+      ${s.code===1 ? "≥ 70%" :
+        s.code===2 ? "60%–<70%" :
+        s.code===3 ? "50%–<60%" :
+        s.code===4 ? "40%–<50%" : "< 40%"}
+    </div>`;
+  legend.appendChild(div);
+});
+
+/* ====== KPIs + أعلى/أقل ====== */
+const overall = schoolOverall();
+const g5 = gradeOverall("الخامس");
+const g6 = gradeOverall("السادس");
+
+document.getElementById("kpiOverall").textContent = fmt(overall);
+document.getElementById("kpiOverallChip").innerHTML = chipHTML(judge(overall));
+document.getElementById("kpiG5").textContent = fmt(g5);
+document.getElementById("kpiG6").textContent = fmt(g6);
+
+const bestGrade = (g6>=g5) ? "السادس" : "الخامس";
+const worstGrade= (g6>=g5) ? "الخامس" : "السادس";
+document.getElementById("bestGrade").textContent = bestGrade;
+document.getElementById("worstGrade").textContent= worstGrade;
+
+document.getElementById("tagG5").innerHTML = (bestGrade==="الخامس") ? "🥇 <b>أفضل صف</b>" : "🥉 <b>أقل صف</b>";
+document.getElementById("tagG6").innerHTML = (bestGrade==="السادس") ? "🥇 <b>أفضل صف</b>" : "🥉 <b>أقل صف</b>";
+
+const stageSubs = subjects.map(s=>subjectStage(s));
+const stageBW = bestWorstRows(stageSubs);
+document.getElementById("bestSubject").textContent = stageBW.best.subject;
+document.getElementById("worstSubject").textContent= stageBW.worst.subject;
+
+/* ====== جدول ====== */
+const tbody = document.getElementById("tbody");
+rows.forEach(r=>{
+  const j = judge(r.pct);
+  const tr = document.createElement("tr");
+  tr.className="border-b last:border-b-0 hover:bg-slate-50 cursor-pointer";
+  tr.title="اضغطي لفتح تحليل المادة";
+  tr.onclick = ()=> openModal("subject", r.subject);
+  tr.innerHTML = `
+    <td class="py-2 px-2">${barHTML(j.color)}</td>
+    <td class="py-2 px-2 font-extrabold">${r.grade}</td>
+    <td class="py-2 px-2">${r.subject} ${r.subject===stageBW.best.subject ? "🥇" : r.subject===stageBW.worst.subject ? "🥉" : ""}</td>
+    <td class="py-2 px-2 mono">${r.achievers}</td>
+    <td class="py-2 px-2 mono">${r.total}</td>
+    <td class="py-2 px-2 mono font-extrabold">${fmt(r.pct)}</td>
+    <td class="py-2 px-2">${chipHTML(j)}</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+/* ====== Chart ====== */
+const d5 = subjects.map(s=>pctOf("الخامس", s));
+const d6 = subjects.map(s=>pctOf("السادس", s));
+
+const chart = new Chart(document.getElementById("subjectsChart"),{
+  type:"bar",
+  data:{
+    labels:subjects,
+    datasets:[
+      {label:"الخامس", data:d5, backgroundColor:"rgba(14,165,233,.75)", borderColor:"rgba(14,165,233,1)", borderWidth:1, borderRadius:10},
+      {label:"السادس", data:d6, backgroundColor:"rgba(168,85,247,.70)", borderColor:"rgba(168,85,247,1)", borderWidth:1, borderRadius:10},
+    ]
+  },
+  options:{
+    onClick:(evt, elements)=>{
+      if(!elements?.length) return;
+      const subject = chart.data.labels[elements[0].index];
+      openModal("subject", subject);
+    },
+    scales:{y:{beginAtZero:true,max:100}}
+  }
+});
+
+/* ====== Modal ====== */
+const backdrop = document.getElementById("modalBackdrop");
+const modalKicker = document.getElementById("modalKicker");
+const modalTitle  = document.getElementById("modalTitle");
+const modalBody   = document.getElementById("modalBody");
+
+function closeModal(){
+  backdrop.classList.remove("show");
+  document.body.style.overflow="";
+}
+backdrop.addEventListener("click",(e)=>{ if(e.target===backdrop) closeModal(); });
+
+function openModal(type, key){
+  backdrop.classList.add("show");
+  document.body.style.overflow="hidden";
+  renderModal(type, key);
+}
+
+function box(title, html){
+  return `<div class="border rounded-2xl p-4"><div class="font-extrabold mb-2">${title}</div><div class="text-slate-700 leading-7">${html}</div></div>`;
+}
+
+function renderModal(type, key){
+  if(type==="summary"){
+    modalKicker.textContent = "تحليل شامل";
+    modalTitle.textContent  = "مستوى الصف + المادة + المرحلة";
+    const j = judge(overall);
+    modalBody.innerHTML = `
+      ${box("ملخص المرحلة", `
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-3xl font-extrabold mono">${fmt(overall)}</span>
+          ${chipHTML(j)}
+        </div>
+        <div class="mt-2">🥇 أفضل صف: <b>${bestGrade}</b> (${fmt(bestGrade==="الخامس"?g5:g6)})</div>
+        <div>🥉 أقل صف: <b>${worstGrade}</b> (${fmt(worstGrade==="الخامس"?g5:g6)})</div>
+        <div class="mt-2">🥇 أفضل مادة: <b>${stageBW.best.subject}</b> (${fmt(stageBW.best.pct)})</div>
+        <div>🥉 أقل مادة: <b>${stageBW.worst.subject}</b> (${fmt(stageBW.worst.pct)})</div>
+      `)}
+      ${box("توصية قيادية سريعة", `
+        ${overall < 50 ? "🚨 تدخل عاجل في المواد الأقل إتقان مع خطط علاجية أسبوعية وقياس قبلي/بعدي." :
+          overall < 60 ? "🟡 تعزيز المهارات الأساسية وتحسين التقويم البنائي مع مجموعات مرنة." :
+          "✅ تثبيت الممارسات الفاعلة وتوسيع الإثراء للمتفوقات."}
+      `)}
+    `;
+    return;
+  }
+
+  if(type==="subjectHub"){
+    modalKicker.textContent = "تحليل مستوى المادة";
+    modalTitle.textContent  = "اختاري مادة";
+    const list = stageSubs
+      .sort((a,b)=>b.pct-a.pct)
+      .map(x=>{
+        const j = judge(x.pct);
+        const crown = (x.subject===stageBW.best.subject) ? "🥇" : (x.subject===stageBW.worst.subject) ? "🥉" : "";
+        return `
+          <button class="w-full text-right border rounded-xl px-3 py-2 hover:bg-slate-50 font-bold"
+            onclick="openModal('subject','${x.subject}')">
+            ${crown} ${x.subject} — <span class="mono">${fmt(x.pct)}</span> ${chipHTML(j)}
+          </button>`;
+      }).join("");
+    modalBody.innerHTML = box("قائمة المواد (مرحلة 5+6)", list || "—");
+    return;
+  }
+
+  if(type==="stage"){
+    modalKicker.textContent = "تحليل مستوى المرحلة";
+    modalTitle.textContent  = "المرحلة (خامس + سادس)";
+    const j = judge(overall);
+    const low3 = stageSubs.sort((a,b)=>a.pct-b.pct).slice(0,3).map(x=>{
+      const jj = judge(x.pct);
+      return `<div class="flex items-center justify-between gap-2 border rounded-xl px-3 py-2">
+        <div>📌 <b>${x.subject}</b></div>
+        <div class="flex items-center gap-2">
+          <span class="mono font-extrabold">${fmt(x.pct)}</span>
+          ${chipHTML(jj)}
+          <button class="px-3 py-1 rounded-lg border hover:bg-slate-50 font-bold" onclick="openModal('subject','${x.subject}')">تحليل</button>
+        </div>
+      </div>`;
+    }).join("");
+    modalBody.innerHTML = `
+      ${box("مؤشر المرحلة", `
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-3xl font-extrabold mono">${fmt(overall)}</span>
+          ${chipHTML(j)}
+        </div>
+        <div class="mt-2">🥇 أفضل صف: <b>${bestGrade}</b> | 🥉 أقل صف: <b>${worstGrade}</b></div>
+        <div class="mt-2">🥇 أفضل مادة: <b>${stageBW.best.subject}</b> | 🥉 أقل مادة: <b>${stageBW.worst.subject}</b></div>
+      `)}
+      ${box("أولوية تدخل (أقل 3 مواد)", low3 || "—")}
+    `;
+    return;
+  }
+
+  if(type==="classes"){
+    modalKicker.textContent = "تحليل مستوى الفصول";
+    modalTitle.textContent  = "الفصول (13 فصل)";
+    modalBody.innerHTML = box("جاهز للربط", `
+      هذا المستوى يحتاج بيانات الفصول (الشعب) مثل: <b>الفصل، الصف، المادة، العدد، الحاصلين/النسبة</b>.
+      <br><br>
+      عند تزويدي بها سأعرض تلقائياً:
+      <ul class="list-disc pr-5">
+        <li>🥇 أعلى فصل و🥉 أقل فصل لكل مادة</li>
+        <li>أفضل/أقل فصل على مستوى المرحلة</li>
+        <li>تصنيف الفصول حسب الأحكام بالألوان</li>
+      </ul>
+    `);
+    return;
+  }
+
+  if(type==="subject"){
+    const subject = key;
+    const g5r = rows.find(r=>r.subject===subject && r.grade==="الخامس");
+    const g6r = rows.find(r=>r.subject===subject && r.grade==="السادس");
+    const st  = subjectStage(subject);
+    const jst = judge(st.pct);
+
+    modalKicker.textContent = "تحليل المادة";
+    modalTitle.textContent  = subject;
+
+    modalBody.innerHTML = `
+      ${box("ملخص المقارنة", `
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="border rounded-2xl p-3">
+            <div class="text-slate-500 text-sm">الخامس</div>
+            <div class="text-2xl font-extrabold mono">${fmt(g5r.pct)}</div>
+            <div class="mt-2">${chipHTML(judge(g5r.pct))}</div>
+            <div class="text-slate-600 text-sm mt-2">الحاصلين: <b>${g5r.achievers}</b> من <b>${g5r.total}</b></div>
+          </div>
+          <div class="border rounded-2xl p-3">
+            <div class="text-slate-500 text-sm">السادس</div>
+            <div class="text-2xl font-extrabold mono">${fmt(g6r.pct)}</div>
+            <div class="mt-2">${chipHTML(judge(g6r.pct))}</div>
+            <div class="text-slate-600 text-sm mt-2">الحاصلين: <b>${g6r.achievers}</b> من <b>${g6r.total}</b></div>
+          </div>
+          <div class="border rounded-2xl p-3">
+            <div class="text-slate-500 text-sm">المرحلة (5+6)</div>
+            <div class="text-2xl font-extrabold mono">${fmt(st.pct)}</div>
+            <div class="mt-2">${chipHTML(jst)}</div>
+            <div class="text-slate-600 text-sm mt-2">الحاصلين: <b>${st.achievers}</b> من <b>${st.total}</b></div>
+          </div>
+        </div>
+        <div class="mt-3">فجوة الصفين: <b class="mono">${Math.abs(g5r.pct-g6r.pct).toFixed(2)}%</b></div>
+      `)}
+      ${box("علامة المستوى", `
+        ${subject===stageBW.best.subject ? "🥇 <b>أفضل مادة على مستوى المرحلة</b>" :
+          subject===stageBW.worst.subject ? "🥉 <b>أقل مادة على مستوى المرحلة</b>" :
+          "—"}
+      `)}
+    `;
+  }
+}
+
+/* ESC */
+document.addEventListener("keydown",(e)=>{ if(e.key==="Escape") closeModal(); });
+</script>
+</body>
+</html>
